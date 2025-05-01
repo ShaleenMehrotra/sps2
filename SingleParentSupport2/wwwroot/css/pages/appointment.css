@@ -175,7 +175,7 @@
         color: #adb5bd;
     }
 
-    .calendar-day.today {
+    .calendar-day.selected {
         background-color: #e8f4ff;
         border-color: #5a67d8;
     }

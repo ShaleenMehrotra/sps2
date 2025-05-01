@@ -63,7 +63,7 @@
                     <div class="calendar-day other-month">
                         <div class="calendar-day-number" data-day="Fri">28</div>
                     </div>
-                    <div class="calendar-day">
+                    <div class="calendar-day selected">
                         <div class="calendar-day-number" data-day="Sat">1</div>
                     </div>
                     <div class="calendar-day">
@@ -123,7 +123,7 @@
                     <div class="calendar-day">
                         <div class="calendar-day-number" data-day="Thu">20</div>
                     </div>
-                    <div class="calendar-day today">
+                    <div class="calendar-day">
                         <div class="calendar-day-number" data-day="Fri">21</div>
                     </div>
                     <div class="calendar-day">
@@ -176,7 +176,7 @@
 
             <div class="form-group">
                 <label class="form-label">Selected Date</label>
-                <input type="text" id="selected-date" name="AppointmentDate" class="form-control" readonly required>
+                <input type="date" id="selected-date" name="AppointmentDate" class="form-control" readonly required>
             </div>
 
             <div class="form-group">
@@ -244,16 +244,16 @@
     <div class="appointment-list">
         <h2>Your Upcoming Appointments</h2>
 
-        @if (Model != null && Model.Any())
+        @if (Model != null && Model.Count > 0)
         {
             @foreach (var appointment in Model)
             {
                 <div class="appointment-card">
                     <div class="appointment-header">
                         <div class="appointment-title">
-                            <h3>Appointment with @appointment.Volunteer.FirstName @appointment.Volunteer.LastName</h3>
-                            <div class="appointment-meta">
-                                <span>Appointment ID: #@appointment.AppointmentId</span>
+@*                             <h3>Appointment with @appointment.Volunteer.FirstName @appointment.Volunteer.LastName</h3>
+ *@                            <div class="appointment-meta">
+                                <span>Appointment ID: #@appointment.Id</span>
                             </div>
                         </div>
                         <div class="appointment-status status-@appointment.Status.ToLower()">
@@ -275,8 +275,8 @@
                         </div>
                     </div>
                     <div class="appointment-actions">
-                        <a href="/Appointment/Reschedule/@appointment.AppointmentId" class="appointment-button reschedule">Reschedule</a>
-                        <a href="/Appointment/Cancel/@appointment.AppointmentId" class="appointment-button cancel">Cancel</a>
+                        <a href="/Appointment/Reschedule/@appointment.Id" class="appointment-button reschedule">Reschedule</a>
+                        <a href="/Appointment/Cancel/@appointment.Id" class="appointment-button cancel">Cancel</a>
                     </div>
                 </div>
             }
@@ -318,11 +318,18 @@
                     this.classList.add('selected');
 
                     // Get the day number and month/year from calendar title
-                    const dayNumber = this.querySelector('.calendar-day-number').textContent;
-                    const monthYear = document.querySelector('.calendar-title').textContent;
+                    const dayNumber = parseInt(this.querySelector('.calendar-day-number').textContent);
 
-                    // Update selected date input
-                    selectedDateInput.value = `${monthYear} ${dayNumber}, 2025`;
+                    // Extract month and year from the calendar title (e.g., "March 2025")
+                    const [monthName, year] = document.querySelector('.calendar-title').textContent.split(' ');
+                    const monthIndex = new Date(`${monthName} 1, ${year}`).getMonth(); // 0-based
+
+                    // Create proper ISO date string (yyyy-MM-dd)
+                    const date = new Date(year, monthIndex, dayNumber);
+                    const isoDate = date.toISOString().split('T')[0];
+
+                    // Set input value
+                    selectedDateInput.value = isoDate;
                 });
             });
 
