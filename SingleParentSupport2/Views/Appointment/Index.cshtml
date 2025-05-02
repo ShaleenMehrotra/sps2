@@ -24,14 +24,28 @@
 
             <div class="calendar-container">
                 <div class="calendar-header">
-                    <div class="calendar-title">March 2025</div>
+                    @{
+                        int month = Context.Request.Query["month"].Count > 0 ? int.Parse(Context.Request.Query["month"]) : DateTime.Now.Month;
+                        int year = Context.Request.Query["year"].Count > 0 ? int.Parse(Context.Request.Query["year"]) : DateTime.Now.Year;
+                        DateTime currentDate = new DateTime(year, month, 1);
+                    }
+                    <div class="calendar-title">@currentDate.ToString("MMMM yyyy")</div>
                     <div class="calendar-nav">
-                        <button type="button" class="calendar-nav-btn" id="prev-month">
-                            <i class="bi bi-chevron-left"></i>
-                        </button>
-                        <button type="button" class="calendar-nav-btn" id="next-month">
-                            <i class="bi bi-chevron-right"></i>
-                        </button>
+                        @{
+                            var prev = currentDate.AddMonths(-1);
+                            var next = currentDate.AddMonths(1);
+                        }
+                        <div class="calendar-nav">
+                            <a class="calendar-nav-btn" asp-controller="Appointment" asp-action="Index"
+                               asp-route-month="@prev.Month" asp-route-year="@prev.Year" title="Previous Month">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+
+                            <a class="calendar-nav-btn" asp-controller="Appointment" asp-action="Index"
+                               asp-route-month="@next.Month" asp-route-year="@next.Year" title="Next Month">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -45,132 +59,55 @@
                     <div class="calendar-day-header">Sat</div>
 
                     <!-- Calendar days would be dynamically generated -->
-                    <div class="calendar-day other-month">
-                        <div class="calendar-day-number" data-day="Sun">23</div>
-                    </div>
-                    <div class="calendar-day other-month">
-                        <div class="calendar-day-number" data-day="Mon">24</div>
-                    </div>
-                    <div class="calendar-day other-month">
-                        <div class="calendar-day-number" data-day="Tue">25</div>
-                    </div>
-                    <div class="calendar-day other-month">
-                        <div class="calendar-day-number" data-day="Wed">26</div>
-                    </div>
-                    <div class="calendar-day other-month">
-                        <div class="calendar-day-number" data-day="Thu">27</div>
-                    </div>
-                    <div class="calendar-day other-month">
-                        <div class="calendar-day-number" data-day="Fri">28</div>
-                    </div>
-                    <div class="calendar-day selected">
-                        <div class="calendar-day-number" data-day="Sat">1</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Sun">2</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Mon">3</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Tue">4</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Wed">5</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Thu">6</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Fri">7</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Sat">8</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Sun">9</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Mon">10</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Tue">11</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Wed">12</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Thu">13</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Fri">14</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Sat">15</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Sun">16</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Mon">17</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Tue">18</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Wed">19</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Thu">20</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Fri">21</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Sat">22</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Sun">23</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Mon">24</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Tue">25</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Wed">26</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Thu">27</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Fri">28</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Sat">29</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Sun">30</div>
-                    </div>
-                    <div class="calendar-day">
-                        <div class="calendar-day-number" data-day="Mon">31</div>
-                    </div>
-                    <div class="calendar-day other-month">
-                        <div class="calendar-day-number" data-day="Tue">1</div>
-                    </div>
-                    <div class="calendar-day other-month">
-                        <div class="calendar-day-number" data-day="Wed">2</div>
-                    </div>
-                    <div class="calendar-day other-month">
-                        <div class="calendar-day-number" data-day="Thu">3</div>
-                    </div>
-                    <div class="calendar-day other-month">
-                        <div class="calendar-day-number" data-day="Fri">4</div>
-                    </div>
-                    <div class="calendar-day other-month">
-                        <div class="calendar-day-number" data-day="Sat">5</div>
-                    </div>
+                    @{
+                        // Start of the current month
+                        var firstOfMonth = new DateTime(year, month, 1);
+                        // Total days in current month
+                        var daysInMonth = DateTime.DaysInMonth(year, month);
+                        // Day of week the month starts on (0 = Sunday, 6 = Saturday)
+                        int startDayOfWeek = (int)firstOfMonth.DayOfWeek;
+
+                        // Previous month info
+                        var prevMonthDate = firstOfMonth.AddMonths(-1);
+                        int daysInPrevMonth = DateTime.DaysInMonth(prevMonthDate.Year, prevMonthDate.Month);
+
+                        // Total slots to fill = 42 (6 weeks x 7 days)
+                        int totalSlots = 42;
+
+                        for (int i = 0; i < totalSlots; i++)
+                        {
+                            DateTime cellDate;
+                            string cssClass = "calendar-day";
+
+                            if (i < startDayOfWeek)
+                            {
+                                // Fill from previous month
+                                int day = daysInPrevMonth - startDayOfWeek + i + 1;
+                                cellDate = new DateTime(prevMonthDate.Year, prevMonthDate.Month, day);
+                                cssClass += " other-month";
+                            }
+                            else if (i >= startDayOfWeek + daysInMonth)
+                            {
+                                // Fill from next month
+                                int day = i - (startDayOfWeek + daysInMonth) + 1;
+                                var nextMonthDate = firstOfMonth.AddMonths(1);
+                                cellDate = new DateTime(nextMonthDate.Year, nextMonthDate.Month, day);
+                                cssClass += " other-month";
+                            }
+                            else
+                            {
+                                // Current month
+                                int day = i - startDayOfWeek + 1;
+                                cellDate = new DateTime(year, month, day);
+                            }
+
+                            <div class="@cssClass">
+                                <div class="calendar-day-number" data-day="@cellDate.ToString("ddd")">
+                                    @cellDate.Day
+                                </div>
+                            </div>
+                        }
+                    }
                 </div>
             </div>
 
@@ -326,7 +263,8 @@
 
                     // Create proper ISO date string (yyyy-MM-dd)
                     const date = new Date(year, monthIndex, dayNumber);
-                    const isoDate = date.toISOString().split('T')[0];
+                    const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+                    const isoDate = localDate.toISOString().split('T')[0];
 
                     // Set input value
                     selectedDateInput.value = isoDate;
