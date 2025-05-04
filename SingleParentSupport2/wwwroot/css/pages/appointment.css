@@ -358,6 +358,11 @@
     color: #004085;
 }
 
+.status-rescheduled {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
 .status-completed {
     background-color: #d4edda;
     color: #155724;

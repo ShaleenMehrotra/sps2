@@ -38,14 +38,7 @@ namespace SingleParentSupport2.Controllers
         [HttpPost]
         public async Task<IActionResult> Schedule(AppointmentViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                // Log validation errors for debugging
-                var errors = ModelState.Values.SelectMany(v => v.Errors);
-                return View(model);
-            }
-
-            if (ModelState.IsValid)
+             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(User);
 
@@ -55,8 +48,12 @@ namespace SingleParentSupport2.Controllers
                     //VolunteerId = model.VolunteerId.ToString(),
                     Purpose = model.Purpose,
                     AppointmentDate = model.AppointmentDate,
+                    AppointmentTime = model.AppointmentTime,
                     Status = "Scheduled"
                 };
+
+                TempData["AppointmentDate"] = model.AppointmentDate.ToString("dd-MM-yyyy");
+                TempData["AppointmentTime"] = model.AppointmentTime.ToString();
 
                 _context.Appointments.Add(appointment);
                 await _context.SaveChangesAsync();
@@ -78,10 +75,52 @@ namespace SingleParentSupport2.Controllers
             return View();
         }
 
-        public IActionResult Reschedule(int id)
+
+        public async Task<IActionResult> Reschedule(int id)
         {
-            // Logic to get appointment by id would go here
-            return View();
+            var appointment = await _context.Appointments
+                .Include(a => a.Volunteer)
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (appointment == null)
+            {
+                return NotFound();
+            }
+
+            var model = new AppointmentViewModel
+            {
+                AppointmentId = appointment.Id,
+                AppointmentDate = appointment.AppointmentDate,
+                Purpose = appointment.Purpose
+                //VolunteerId = appointment.VolunteerId
+            };
+
+            return View("Reschedule", model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Reschedule(AppointmentViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var appointment = await _context.Appointments.FindAsync(model.AppointmentId);
+
+            if (appointment == null)
+            {
+                return NotFound();
+            }
+
+            appointment.AppointmentDate = model.AppointmentDate;
+            appointment.Purpose = model.Purpose;
+            //appointment.VolunteerId = model.VolunteerId;
+            appointment.Status = "Rescheduled";
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> Cancel(int id)
