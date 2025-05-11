@@ -54,12 +54,10 @@
         background-color: #dceffd;
     }
 
-.calendar-day-number.selected {
-    background-color: #007bff;
-    color: white;
-    font-weight: bold;
-    border-radius: 50%;
-}
+    .calendar-day.selected {
+        background-color: #e8f4ff;
+        border-color: #5a67d8;
+    }
 
 .calendar-day.other-month {
     color: #aaa;
@@ -67,34 +65,34 @@
 }
 
 .time-slots {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 10px;
+    margin-top: 20px;
 }
 
 .time-slot {
-    padding: 10px 15px;
-    border: 1px solid #007bff;
-    border-radius: 20px;
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    text-align: center;
     cursor: pointer;
-    color: #007bff;
-    background-color: #fff;
+    transition: all 0.3s;
 }
 
     .time-slot:hover {
-        background-color: #007bff;
-        color: white;
+        background-color: #e9ecef;
     }
 
     .time-slot.selected {
-        background-color: #007bff;
+        background-color: #5a67d8;
         color: white;
-        font-weight: bold;
+        border-color: #5a67d8;
     }
 
     .time-slot.unavailable {
-        border-color: #ccc;
-        color: #ccc;
+        background-color: #f8f9fa;
+        color: #adb5bd;
         cursor: not-allowed;
     }
 

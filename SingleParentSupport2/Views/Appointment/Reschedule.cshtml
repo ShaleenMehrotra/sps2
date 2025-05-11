@@ -98,20 +98,12 @@
                 <input type="date" id="selected-date" name="AppointmentDate" class="form-control" readonly required>
             </div>
 
-            <div class="form-group mt-3">
+            <div class="form-group">
                 <label class="form-label">Available Time Slots</label>
                 <div class="time-slots">
-                    <div class="time-slot" data-time="09:00">9:00 AM</div>
-                    <div class="time-slot" data-time="10:00">10:00 AM</div>
-                    <div class="time-slot" data-time="11:00">11:00 AM</div>
-                    <div class="time-slot" data-time="12:00">12:00 PM</div>
-                    <div class="time-slot" data-time="13:00">1:00 PM</div>
-                    <div class="time-slot" data-time="14:00">2:00 PM</div>
-                    <div class="time-slot" data-time="15:00">3:00 PM</div>
-                    <div class="time-slot" data-time="16:00">4:00 PM</div>
-                    <div class="time-slot unavailable" data-time="17:00">5:00 PM</div>
+                    <!-- Time slots will be populated dynamically here -->
                 </div>
-                <input type="hidden" id="selected-time" name="AppointmentTime" required />
+                <input type="hidden" id="selected-time" name="AppointmentTime" required>
             </div>
 
             <div class="form-group mt-3">
@@ -141,18 +133,37 @@
 
 @section Scripts {
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const dateInput = document.getElementById("selected-date");
-            const timeInput = document.getElementById("selected-time");
+            document.addEventListener("DOMContentLoaded", function () {
+                const dateInput = document.getElementById("selected-date");
+                const timeInput = document.getElementById("selected-time");
 
-            document.querySelectorAll(".calendar-day-number").forEach(el => {
-                el.addEventListener("click", function () {
-                    const selected = document.querySelector(".calendar-day-number.selected");
-                    if (selected) selected.classList.remove("selected");
-                    this.classList.add("selected");
-                    const selectedDate = this.getAttribute("data-day");
-                    dateInput.value = selectedDate;
-                });
+                const calendarDays = document.querySelectorAll('.calendar-day:not(.other-month)');
+
+                calendarDays.forEach(day => {
+                    day.addEventListener('click', function () {
+                        // Remove selected class from all days
+                        calendarDays.forEach(d => d.classList.remove('selected'));
+
+                        // Add selected class to clicked day
+                        this.classList.add('selected');
+
+                        const dayNumber = parseInt(this.querySelector('.calendar-day-number').textContent);
+
+                        // Extract month and year from the calendar title (e.g., "March 2025")
+                        const [monthName, year] = document.querySelector('.calendar-title').textContent.split(' ');
+                        const monthIndex = new Date(`${monthName} 1, ${year}`).getMonth(); // 0-based
+
+                        // Create proper ISO date string (yyyy-MM-dd)
+                        const date = new Date(year, monthIndex, dayNumber);
+                        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+                        const isoDate = localDate.toISOString().split('T')[0];
+
+                        // Set input value
+                        dateInput.value = isoDate;
+
+                        // Trigger change event in case there is a listener
+                        $('#selected-date').trigger('change');
+                    });
             });
 
             document.querySelectorAll(".time-slot").forEach(slot => {
@@ -163,6 +174,59 @@
                     timeInput.value = this.getAttribute("data-time");
                 });
             });
+        });
+
+        $(document).ready(function () {
+            const volunteerId = '@Model.VolunteerId';
+
+            // On date change, fetch available time slots
+            $('#selected-date').on('change', function () {
+                const date = $(this).val();
+                if (date && volunteerId) {
+                    fetchAvailableTimes(volunteerId, date);
+                }
+            });
+
+            // Fetch available time slots from server
+            function fetchAvailableTimes(volunteerId, date) {
+                $.ajax({
+                    url: '@Url.Action("GetAvailableTime", "Appointment")',
+                    data: { volunteerId: volunteerId, date: date },
+                    success: function (data) {
+                        $('.time-slots').empty();
+
+                        // Generate time slots between 9:00 and 21:00
+                        for (let hour = 9; hour <= 21; hour++) {
+                            const timeStr = (hour < 10 ? "0" + hour : hour) + ":00";
+                            const isAvailable = data.some(slot => slot.time === timeStr && slot.isAvailable);
+
+                            const timeSlot = $('<div>')
+                                .addClass('time-slot')
+                                .attr('data-time', timeStr)
+                                .text(formatTime(timeStr));
+
+                            if (!isAvailable) {
+                                timeSlot.addClass('unavailable');
+                            }
+
+                            $('.time-slots').append(timeSlot);
+                        }
+                    },
+                    error: function () {
+                        alert("Error fetching available times.");
+                    }
+                });
+            }
+
+            // Helper to format time like "09:00" → "9:00 AM"
+            function formatTime(time) {
+                const [hourStr, minute] = time.split(':');
+                let hour = parseInt(hourStr);
+                const ampm = hour >= 12 ? 'PM' : 'AM';
+                if (hour > 12) hour -= 12;
+                if (hour === 0) hour = 12;
+                return `${hour}:${minute} ${ampm}`;
+            }
         });
     </script>
 }
