@@ -118,6 +118,7 @@ namespace SingleParentSupport2.Controllers
             }
 
             appointment.AppointmentDate = model.AppointmentDate;
+            appointment.AppointmentTime = model.AppointmentTime;
             appointment.Purpose = model.Purpose;
             appointment.VolunteerId = model.VolunteerId;
             appointment.Status = "Rescheduled";
