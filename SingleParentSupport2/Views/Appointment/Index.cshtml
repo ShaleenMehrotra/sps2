@@ -17,6 +17,41 @@
 </div>
 
 <div class="container appointment-container">
+	@if (User.IsInRole("Admin"))
+	{
+		<!-- Modal -->
+		<div class="modal fade" id="bookingInfoModal" tabindex="-1" aria-labelledby="allBookingsLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-xl">
+				<!-- Centered + Extra wide -->
+				<div class="modal-content shadow-lg rounded-4 border-0">
+					<div class="modal-header bg-primary text-white">
+						<h5 class="modal-title" id="allBookingsLabel">All Bookings</h5>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body bg-light">
+						<div class="table-responsive">
+							<table class="table table-hover align-middle text-center table-bordered table-striped rounded-3 overflow-hidden" id="appointmentsTable">
+								<thead class="table-dark">
+									<tr>
+										<th>User</th>
+										<th>Volunteer</th>
+										<th>Date</th>
+										<th>Time</th>
+										<th>Purpose</th>
+									</tr>
+								</thead>
+								<tbody>
+									<!-- Populated via JS -->
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	}
+
 	<div class="appointment-form">
 		<h2>Book Your Appointment</h2>
 		<p>Select a date, time, and volunteer to schedule your appointment.</p>
@@ -169,6 +204,14 @@
 			</div>
 
 			<button type="submit" class="submit-button">Schedule Appointment</button>
+
+			@if (User.IsInRole("Admin"))
+			{
+				<button type="button" class="submit-button info-button" data-bs-toggle="modal" data-bs-target="#bookingInfoModal" id="viewBookingsBtn">
+					View All Bookings
+				</button>
+			}
+
 		</form>
 	</div>
 
@@ -371,6 +414,36 @@
 
 					return hours + ':' + minutes + ' ' + period;
 				}
+
+				$('#viewBookingsBtn').click(function () {
+					$.ajax({
+						url: '/Appointment/GetAllAppointments',
+						type: 'GET',
+						success: function (data) {
+							const tbody = $('#appointmentsTable tbody');
+							tbody.empty(); // Clear previous rows
+
+							if (data.length === 0) {
+								tbody.append('<tr><td colspan="4">No appointments found.</td></tr>');
+							} else {
+								data.forEach(appt => {
+									const row = `
+										<tr>
+											<td>${appt.user}</td>
+											<td>${appt.volunteer}</td>
+											<td>${appt.date}</td>
+											<td>${appt.time}</td>
+											<td>${appt.purpose}</td>
+										</tr>`;
+									tbody.append(row);
+								});
+							}
+						},
+						error: function () {
+							alert('Failed to load appointments.');
+						}
+					});
 		});
+	});
 	</script>
 }
