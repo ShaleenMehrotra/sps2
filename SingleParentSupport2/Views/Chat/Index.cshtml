@@ -210,25 +210,34 @@
 
             // Chat room selection
             chatRooms.forEach(room => {
-                room.addEventListener('click', function() {
-                    // Remove active class from all rooms
-                    chatRooms.forEach(r => r.classList.remove('active'));
+            room.addEventListener('click', async function () {
+                // Remove active class from all rooms
+                chatRooms.forEach(r => r.classList.remove('active'));
+                this.classList.add('active');
 
-                    // Add active class to clicked room
-                    this.classList.add('active');
+                // Update the unread badge
+                const badge = room.querySelector(".unread-badge");
+                if (badge) {
+                    badge.style.display = "none"; // hides it
+                }
 
-                    // Update chat header
-                    const roomName = this.querySelector('.room-name').textContent;
-                    const roomAvatar = this.querySelector('.room-avatar img').src;
+                // Update header
+                const roomName = this.querySelector('.room-name').textContent;
+                const roomAvatar = this.querySelector('.room-avatar img').src;
+                chatHeaderName.textContent = roomName;
+                chatHeaderAvatar.src = roomAvatar;
 
-                    chatHeaderName.textContent = roomName;
-                    chatHeaderAvatar.src = roomAvatar;
+                const receiverId = this.getAttribute('data-room-id');
 
-                    // Here you would typically load messages for the selected room
-                    // For demo purposes, we'll just clear the messages
-                    chatMessages.innerHTML = '';
+                // Fetch messages
+                const response = await fetch(`/Chat/GetMessages?receiverId=${receiverId}`);
+                const messages = await response.json();
 
-                    // Add a welcome message
+                // Clear chat
+                chatMessages.innerHTML = '';
+
+                if (messages.length === 0) {
+                    // Show welcome message
                     const welcomeMessage = document.createElement('div');
                     welcomeMessage.className = 'message incoming';
                     welcomeMessage.innerHTML = `
@@ -236,18 +245,33 @@
                             <img src="${roomAvatar}" alt="${roomName}">
                         </div>
                         <div class="message-content">
-                            <div class="message-bubble">
-                                Welcome to ${roomName}! How can we help you today?
-                            </div>
+                            <div class="message-bubble">Welcome to ${roomName}! How can we help you today?</div>
                             <div class="message-time">Just now</div>
                         </div>
                     `;
                     chatMessages.appendChild(welcomeMessage);
+                } else {
+                    // Render messages
+                    messages.forEach(msg => {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = 'message ' + (msg.isOutgoing ? 'outgoing' : 'incoming');
+                        messageDiv.innerHTML = `
+                            <div class="message-avatar">
+                                <img src="${msg.avatarUrl}" alt="${msg.senderName}">
+                            </div>
+                            <div class="message-content">
+                                <div class="message-bubble">${msg.content}</div>
+                                <div class="message-time">${msg.timestamp}</div>
+                            </div>
+                        `;
+                        chatMessages.appendChild(messageDiv);
+                    });
+                }
 
-                    // Scroll to bottom
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                });
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             });
+        });
+
 
             // Send message
             chatForm.addEventListener('submit', function(e) {

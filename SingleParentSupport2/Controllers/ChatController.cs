@@ -25,13 +25,22 @@ namespace SingleParentSupport2.Controllers
 
             // Get all chat partners
             var chatPartners = await _context.ChatLogs
-                .Where(m => m.SenderId == userId || m.ReceiverId == userId)
-                .Select(m => m.SenderId == userId ? m.Receiver : m.Sender)
-                .Distinct()
-                .ToListAsync();
+            .Where(m => m.SenderId == userId || m.ReceiverId == userId)
+            .Select(m => new
+                {
+                    Partner = m.SenderId == userId ? m.Receiver : m.Sender,
+                    PartnerId = m.SenderId == userId ? m.ReceiverId : m.SenderId
+                })
+            .GroupBy(x => x.PartnerId)
+            .Select(g => g.First().Partner)
+            .ToListAsync();
+
 
             // Fix: Retrieve the receiverId from the first chat partner's Id directly
-            receiverId = chatPartners.FirstOrDefault()?.Id;
+            if (string.IsNullOrEmpty(receiverId))
+            {
+                receiverId = chatPartners.FirstOrDefault()?.Id;
+            }
 
             var chatRooms = chatPartners.Select(p => new ChatRoomViewModel
             {
@@ -102,5 +111,45 @@ namespace SingleParentSupport2.Controllers
 
             return Json(new { success = false });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMessages(string receiverId)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // Mark all unread messages as read
+            var unreadMessages = await _context.ChatLogs
+                .Where(m => ((m.SenderId == userId && m.ReceiverId == receiverId) || (m.SenderId == receiverId && m.ReceiverId == userId)) && !m.IsRead)
+                .ToListAsync();
+
+            if(unreadMessages.Count > 0)
+            {
+                foreach (var msg in unreadMessages)
+                {
+                    msg.IsRead = true;
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            var messages = await _context.ChatLogs
+                .Where(m => (m.SenderId == userId && m.ReceiverId == receiverId) || (m.SenderId == receiverId && m.ReceiverId == userId))
+                .OrderBy(m => m.Timestamp)
+                .Select(m => new
+                {
+                    messageId = m.Id,
+                    senderId = m.SenderId,
+                    receiverId = m.ReceiverId,
+                    senderName = m.Sender.UserName,
+                    avatarUrl = "https://via.placeholder.com/40",
+                    content = m.Content,
+                    timestamp = m.Timestamp.ToString("g"),
+                    isOutgoing = m.SenderId == userId
+                })
+                .ToListAsync();
+
+            return Json(messages);
+        }
+
     }
 }
