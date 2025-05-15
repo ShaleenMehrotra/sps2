@@ -208,6 +208,12 @@
             const chatForm = document.getElementById('chat-form');
             const chatMessages = document.getElementById('chat-messages');
 
+            // Update header
+            const roomName = this.querySelector('.room-name').textContent;
+            const roomAvatar = this.querySelector('.room-avatar img').src;
+            chatHeaderName.textContent = roomName;
+            chatHeaderAvatar.src = roomAvatar;
+
             // Chat room selection
             chatRooms.forEach(room => {
             room.addEventListener('click', async function () {
@@ -220,12 +226,6 @@
                 if (badge) {
                     badge.style.display = "none"; // hides it
                 }
-
-                // Update header
-                const roomName = this.querySelector('.room-name').textContent;
-                const roomAvatar = this.querySelector('.room-avatar img').src;
-                chatHeaderName.textContent = roomName;
-                chatHeaderAvatar.src = roomAvatar;
 
                 const receiverId = this.getAttribute('data-room-id');
 
