@@ -23,7 +23,7 @@ namespace SingleParentSupport2.Controllers
             var user = await _userManager.GetUserAsync(User);
             var appointments = await _context.Appointments
                 .Include(a => a.Volunteer)
-                .Where(a => a.UserId == user.Id && a.AppointmentDate >= DateTime.Now)
+                .Where(a => a.UserId == user.Id && a.AppointmentDate >= DateTime.Now && a.Status != "Cancelled")
                 .OrderBy(a => a.AppointmentDate)
                 .ToListAsync();
 
