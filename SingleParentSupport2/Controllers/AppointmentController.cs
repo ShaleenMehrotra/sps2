@@ -178,7 +178,7 @@ namespace SingleParentSupport2.Controllers
 
             for (var time = startOfDay; time <= endOfDay; time = time.AddHours(1))
             {
-                bool isBooked = _context.Appointments.Any(a => a.VolunteerId == volunteerId && a.AppointmentDate.Date == date.Date && a.AppointmentTime == time.ToString("HH:mm"));
+                bool isBooked = _context.Appointments.Any(a => a.VolunteerId == volunteerId && a.AppointmentDate.Date == date.Date && a.AppointmentTime == time.ToString("HH:mm") && a.Status != "Cancelled");
 
                 // Format the time for display and use in the slot
                 availableTimes.Add(new AvailableTime { Time = time.ToString("HH:mm"), IsAvailable = !isBooked });
