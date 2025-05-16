@@ -54,10 +54,10 @@ namespace SingleParentSupport2.Controllers
 
                 TempData["AppointmentDate"] = model.AppointmentDate.ToString("dd-MM-yyyy");
                 TempData["AppointmentTime"] = model.AppointmentTime.ToString();
-                TempData["VolunteerName"] = await _userManager.Users
+                TempData["VolunteerName"] = _userManager.Users
                                                             .Where(u => u.Id == model.VolunteerId)
                                                             .Select(u => u.FirstName + " " + u.LastName )
-                                                            .FirstOrDefaultAsync();
+                                                            .FirstOrDefault();
 
                 _context.Appointments.Add(appointment);
                 await _context.SaveChangesAsync();
@@ -74,33 +74,33 @@ namespace SingleParentSupport2.Controllers
             return View("Index", userAppointments);
         }
 
-        public IActionResult Confirmation()
-        {
-            return View();
-        }
+        //public IActionResult Confirmation()
+        //{
+        //    return View();
+        //}
 
 
-        public async Task<IActionResult> Reschedule(int id)
-        {
-            var appointment = await _context.Appointments
-                .Include(a => a.Volunteer)
-                .FirstOrDefaultAsync(a => a.Id == id);
+        //public async Task<IActionResult> Reschedule(int id)
+        //{
+        //    var appointment = await _context.Appointments
+        //        .Include(a => a.Volunteer)
+        //        .FirstOrDefaultAsync(a => a.Id == id);
 
-            if (appointment == null)
-            {
-                return NotFound();
-            }
+        //    if (appointment == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var model = new AppointmentViewModel
-            {
-                AppointmentId = appointment.Id,
-                AppointmentDate = appointment.AppointmentDate,
-                Purpose = appointment.Purpose,
-                VolunteerId = appointment.VolunteerId
-            };
+        //    var model = new AppointmentViewModel
+        //    {
+        //        AppointmentId = appointment.Id,
+        //        AppointmentDate = appointment.AppointmentDate,
+        //        Purpose = appointment.Purpose,
+        //        VolunteerId = appointment.VolunteerId
+        //    };
 
-            return View("Reschedule", model);
-        }
+        //    return View("Reschedule", model);
+        //}
 
         [HttpPost]
         public async Task<IActionResult> Reschedule(AppointmentViewModel model)
@@ -171,7 +171,7 @@ namespace SingleParentSupport2.Controllers
 
         private List<AvailableTime> GetAvailableTimes(string volunteerId, DateTime date)
         {
-            List<AvailableTime> availableTimes = new List<AvailableTime>();
+            List<AvailableTime> availableTimes = [];
 
             var startOfDay = date.Date.AddHours(9); // 9 AM
             var endOfDay = date.Date.AddHours(21); // 9 PM
