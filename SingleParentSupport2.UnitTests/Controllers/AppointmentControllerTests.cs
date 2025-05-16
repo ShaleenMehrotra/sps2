@@ -11,7 +11,7 @@ using Moq;
 using SingleParentSupport2.Controllers;
 using SingleParentSupport2.Models;
 
-namespace SingleParentSupport2.UnitTests
+namespace SingleParentSupport2.UnitTests.Controllers
 {
     public class AppointmentControllerTests
     {
@@ -319,6 +319,8 @@ namespace SingleParentSupport2.UnitTests
 
             // Act
             var result = await _controller.GetAllAppointments() as JsonResult;
+
+            // Assert
             Assert.NotNull(result);
 
             // Serialize and deserialize to List<Dictionary<string, object>>
