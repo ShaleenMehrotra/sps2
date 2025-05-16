@@ -89,27 +89,40 @@ namespace SingleParentSupport2.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendMessage([FromBody] ChatLog model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendMessage([FromBody] ChatLog model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var senderId = _userManager.GetUserId(User);
-                var message = new ChatLog
+                if (ModelState.IsValid)
                 {
-                    SenderId = senderId,
-                    ReceiverId = model.ReceiverId,
-                    Content = model.Content,
-                    Timestamp = DateTime.UtcNow,
-                    IsRead = false
-                };
+                    var senderId = _userManager.GetUserId(User);
+                    if (string.IsNullOrEmpty(senderId))
+                        return Json(new { success = false, message = "User not authenticated." });
 
-                _context.ChatLogs.Add(message);
-                await _context.SaveChangesAsync();
+                    var message = new ChatLog
+                    {
+                        SenderId = senderId,
+                        ReceiverId = model.ReceiverId,
+                        Content = model.Content,
+                        Timestamp = DateTime.UtcNow,
+                        IsRead = false
+                    };
 
-                return Json(new { success = true });
+                    var avatarUrl = GetAvatar(senderId);
+
+                    _context.ChatLogs.Add(message);
+                    await _context.SaveChangesAsync();
+
+                    return Json(new { success = true, avatarUrl });
+                }
+                return Json(new { success = false, message = "Model invalid." });
             }
-
-            return Json(new { success = false });
+            catch (Exception ex)
+            {
+                var innerMessage = ex.InnerException?.Message ?? ex.Message;
+                return Json(new { success = false, message = "Server error: " + innerMessage });
+            }
         }
 
         [HttpGet]
