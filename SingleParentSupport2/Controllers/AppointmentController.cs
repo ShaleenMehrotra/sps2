@@ -155,6 +155,7 @@ namespace SingleParentSupport2.Controllers
             var appointments = await _context.Appointments
                 .Include(a => a.User)
                 .Include(a => a.Volunteer)
+                .Where(a => a.AppointmentDate >= DateTime.Now && a.Status != "Cancelled")
                 .ToListAsync();
 
             var result = appointments.Select(a => new {
