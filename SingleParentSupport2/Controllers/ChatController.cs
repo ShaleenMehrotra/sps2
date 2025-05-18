@@ -164,6 +164,25 @@ namespace SingleParentSupport2.Controllers
             return Json(messages);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetUnreadMessageCounts()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // Find unread messages grouped by SenderId (chat rooms)
+            var unreadCounts = await _context.ChatLogs
+                .Where(m => m.ReceiverId == userId && !m.IsRead)
+                .GroupBy(m => m.SenderId)
+                .Select(g => new
+                {
+                    ReceiverId = g.Key,    // The sender of unread messages (the "room")
+                    Count = g.Count()
+                })
+                .ToListAsync();
+
+            return Json(unreadCounts);
+        }
+
         private static string GetAvatar(string id)
         {
             return id switch
