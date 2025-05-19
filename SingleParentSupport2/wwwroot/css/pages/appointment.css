@@ -175,7 +175,7 @@
         color: #adb5bd;
     }
 
-    .calendar-day.today {
+    .calendar-day.selected {
         background-color: #e8f4ff;
         border-color: #5a67d8;
     }
@@ -358,6 +358,11 @@
     color: #004085;
 }
 
+.status-rescheduled {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
 .status-completed {
     background-color: #d4edda;
     color: #155724;
@@ -503,3 +508,20 @@
         text-align: center;
     }
 }
+
+.modal-content {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
