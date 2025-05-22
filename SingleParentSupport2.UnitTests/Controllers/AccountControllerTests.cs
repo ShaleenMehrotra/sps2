@@ -463,20 +463,5 @@ namespace SingleParentSupport2.UnitTests.Controllers
                 new Mock<IUserConfirmation<ApplicationUser>>().Object
             );
         }
-
-        private static ExternalLoginInfo CreateExternalLoginInfo()
-        {
-            var claims = new List<Claim>
-            {
-                new(ClaimTypes.Email, "user@example.com"),
-                new(ClaimTypes.GivenName, "John"),
-                new(ClaimTypes.Surname, "Doe"),
-            };
-
-            var identity = new ClaimsIdentity(claims, "Google");
-            var principal = new ClaimsPrincipal(identity);
-
-            return new ExternalLoginInfo(principal, "Google", "provider-key-123", "Google");
-        }
     }
 }
